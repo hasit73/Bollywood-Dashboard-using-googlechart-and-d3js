@@ -1,0 +1,60 @@
+.verticalnavbar {
+    background-color: rgba(0, 0, 0, 0.733);
+    
+
+    height: 650px;
+    text-align: center;
+    color: white;
+    align-items: center;
+  }
+
+  .dashtitle {
+    background-color: rgba(0, 0, 0, 0.733);
+    width: 100%;
+    height: 75px;
+  }
+
+  hr {
+    background-color: white;
+    height: 8px;
+    margin-top: 0;
+    margin-bottom: 0;
+    width:111%;
+  }
+
+  .verticalparts {
+    height: 28%;
+    margin: 20px;
+  }
+
+  .titlecard {
+    background-color: white;
+    border-radius: 5px;
+    height: 5.9rem;
+    width: 12rem;
+  }
+
+  .valuetitle {
+    font-size: small;
+    margin-top: 0;
+  }
+  .numericvalue {
+    font-size: x-large;
+    margin-bottom: 0;
+    font-weight: bold;
+  }
+  .itembox{
+      margin-bottom: 0;
+      margin-top: 20px;
+  }
+  .dropdownbox{
+    width: 220px;
+    height: 30px;
+    margin: 10px;
+  }
+  .dropdown{
+    width: 100px;
+  }
+  .navbarspan{
+    font-size: 2rem;
+  }

@@ -1,0 +1,1295 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <!-- Required meta tags -->
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+
+
+
+
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-BmbxuPwQa2lc/FVzBcNJ7UAyJxM6wuqIj61tLrc4wSX0szH/Ev+nYRRuWlolflfl" crossorigin="anonymous" />
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.8.1/css/bootstrap-select.css">
+  <link rel="stylesheet" href="https://pro.fontawesome.com/releases/v5.10.0/css/all.css"
+    integrity="sha384-AYmEC3Yw5cVb3ZcuHtOA93w35dYTsvhLPVnYs9eStHfGJvOvKxVfELGroGkvsg+p" crossorigin="anonymous" />
+  <!-- jQuery library -->
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script src="https://kit.fontawesome.com/yourcode.js" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.8.1/js/bootstrap-select.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
+  <!-- CDN for google charts -->
+  <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+  <script src="https://d3js.org/d3.v4.min.js"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='design.css') }}">
+
+  <title>Bollywood dashboard</title>
+
+  <style>
+    #donutdiv {
+      position: relative;
+    }
+
+    .donuttext {
+
+      display: block;
+      width: 240px;
+      height: 240px;
+      text-align: center;
+      vertical-align: middle;
+      position: absolute;
+      top: 38px;
+      /* chartArea top  */
+      left: 55px;
+      /* chartArea left */
+      font-size: 30px;
+      margin-top: 80px;
+
+    }
+
+    #agegrouptable {
+      border: 1px solid black;
+      padding: 5px;
+      background-color: seashell;
+
+      overflow: auto;
+    }
+
+
+    #agegrouptable tr th {
+
+      background-color: rgb(45, 45, 177);
+
+    }
+
+    #agegrouptable tr td {
+      border: 5px solid white;
+      background-color: rgb(157, 157, 230);
+      height: 70px;
+      color: rgb(45, 45, 177);
+      text-align: center;
+      min-width: 70px;
+      border-radius: 20px;
+
+    }
+
+    .charttitle {
+      color: white;
+      font-size: 16px;
+      margin-left: 50px;
+    }
+
+    .charttitlediv {
+      background-color: gray;
+      height: 25px;
+    }
+
+
+    #agegrouptable .tcol,
+    #agegrouptable .tindex {
+
+      background-color: rgb(45, 45, 177);
+      min-width: 80px;
+      color: white;
+    }
+
+    .main {
+      width: 1550px;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="main">
+    <div class="dashtitle col-md-12">
+      <div class="row">
+        <h2 class="col-md-3 mt-3" style="color: white; margin-left: 140px;">
+          Bollywood Dashboard
+
+        </h2>
+
+
+
+        <div class="row col-md-4">
+          <div class="dropdownbox">
+            <p style="color: white;margin-bottom:0;width: 150px;">Select actor</p>
+            <select class="selectpicker dropdown" id="actorselector" multiple data-live-search="true">
+              {% for v in context.listOfActors %}
+
+              <option>{{v}}</option>
+
+              {% endfor %}
+
+            </select>
+          </div>
+          <div class="dropdownbox">
+            <p style="color: white;margin-bottom:0;width: 150px;">Select Genre</p>
+            <select class="selectpicker dropdown" id="genreselector" multiple data-live-search="true"
+              style="width: 100px;">
+              {% for v in context.listOfGenres %}
+
+              <option>{{v}}</option>
+
+              {% endfor %}
+
+            </select>
+          </div>
+        </div>
+
+        <div class="col-md-4 row my-2 ml-2">
+
+          <div class="titlecard col-md-3 my-2" style="margin-left: auto;margin-right: 180px;">
+            <center>
+              <p class="numericvalue" id="totalmoviescount">None</p>
+              <p class="valuetitle">Total Movies</p>
+            </center>
+          </div>
+
+          <div class="titlecard col-md-3 m-2" style="display: none;">
+            <center>
+              <p class="numericvalue" id="lastselectedactor" style="font-size: 20px;">Govinda</p>
+              <p class="valuetitle" style="margin-top: 4px;">Selected Actor</p>
+            </center>
+          </div>
+
+          <div class="titlecard col-md-3 m-2" style="display: none;">
+            <center>
+              <p class="numericvalue">Value3</p>
+              <p class="valuetitle">subtitle3</p>
+            </center>
+
+            <!-- </div>
+              <button data-toggle="modal" data-target="#circlepackingchart" class="my-4 btn btn-light" style="width: 100px;height: 40px;">Hide & show</button>
+            </div> -->
+
+          </div>
+        </div>
+        <hr />
+        <div class="row">
+          <div class="verticalnavbar col-md-1">
+            <div class="verticalparts" onclick="activateBodyof('movies')">
+              <div class="itembox">
+                <p class="navbarspan">Movies</p>
+                <i class="fas fa-video fa-4x"></i>
+              </div>
+            </div>
+            <hr>
+            <div class="verticalparts" onclick="activateBodyof('actors')">
+              <div class="itembox">
+                <p class="navbarspan">Actors</p>
+                <i class="fas fa-users fa-4x"></i>
+              </div>
+
+            </div>
+
+            <hr>
+            <div class="verticalparts" onclick="activateBodyof('budgetprofit')">
+              <div class="itembox">
+                <p class="navbarspan">Budget & Profit</p>
+                <i class="fas fa-rupee-sign fa-4x"></i>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-11">
+            <div id="moviesbody" style=" height: 100%;width: 100%;">
+
+              <div class="row" style="height: 50%;background-color: rgba(0, 0, 0, 0.733);">
+
+
+                <div style="width: 50%;">
+
+                  <div class="charttitlediv">
+                    <p class="charttitle">Top Rated Movies</p>
+                  </div>
+
+                  <div id="topratedmovies" style="height:90%"></div>
+
+
+                </div>
+
+
+                <div style="width: 50%;">
+
+                  <div class="charttitlediv">
+
+                    <div class="row">
+                      <p class="charttitle col-md-4">Year Wise Total Movies</p>
+                      <div class="col-md-5" style="color: white;"><strong>Select Chart : </strong>
+                        <input class="chartgroup" type="radio" value="bar" name="chartgroup" /><b>Bar Chart</b>
+                        <input class="chartgroup" type="radio" value="waterfall" name="chartgroup" /> <b>WaterFall
+                          Chart</b>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div id="yearwisemovies" style="height:90%">Year wise movies</div>
+
+                </div>
+
+
+              </div>
+
+
+              <div class="row" style="height: 50%;background-color:rgba(0, 0, 0, 0.733);">
+
+
+
+                <div id="genrepercentage" style="width: 50%;">
+                  <div class="charttitlediv">
+                    <p class="charttitle">HeatMap Between Target Age Group & Film Genre</p>
+                  </div>
+
+
+                  <div id="tablediv" style="height: 300px;overflow: auto;">
+                    <table id="agegrouptable">
+
+                    </table>
+                  </div>
+                </div>
+                <div style="width: 50%;">
+
+                  <div class="charttitlediv">
+                    <p class="charttitle">Genre wise Charts</p>
+                  </div>
+
+                  <div style="background-color:white;width: 100%;height:90%" id="circlepackingchart"></div>
+
+
+                </div>
+
+
+
+              </div>
+
+
+            </div>
+            <div id="actorsbody" style="display: none; height: 100%;width: 100%;">
+
+
+
+              <div class="row" style="height: 100%;">
+
+                <div style="width: 87%;margin-left:8px;" id="actorbodycontent">
+                  <div class="row" style="height: 50%;background-color: rgba(0, 0, 0, 0.733);">
+
+                    <div style="width: 50%">
+                      <div class="charttitlediv">
+                        <div class="row">
+                          <p class="charttitle col-md-4">Overall Top Rated Actors</p>
+                          <div class="col-md-5" style="color: white;">
+                            <strong>Sort by </strong><select style="width:100px;color:rgb(161, 153, 153)"
+                              id="sortoption">
+                              <option>Total Movies</option>
+                              <option>Total Hits</option>
+                            </select>
+                          </div>
+                        </div>
+                      </div>
+                      <div id="overalltopratedactors" style="height:90%">
+                      </div>
+                    </div>
+
+
+                    <div style="width: 50%;">
+                      <div class="charttitlediv">
+                        <p class="charttitle">Year Wise Actor Performance</p>
+                      </div>
+                      <div id="yearwiseactorperformance" style="height: 90%;"></div>
+                    </div>
+
+                  </div>
+
+
+                  <div class="row" style="height: 50%;background-color: rgba(0, 0, 0, 0.733);">
+
+                    <div style="width: 50%;">
+                      <div class="charttitlediv">
+                        <p class="charttitle">Genre Wise Top Rated Actors</p>
+                      </div>
+                      <div id="genrewiseratedactors" style="height: 90%;"></div>
+                    </div>
+
+                    <div style="width: 50%;">
+                      <div class="charttitlediv">
+                        <p class="charttitle">Comparision Between Actors</p>
+                      </div>
+                      <div id="actorstreemap" style="height: 90%;"></div>
+                    </div>
+
+
+
+                  </div>
+                </div>
+
+
+                <div class="rightsideverticalbar"
+                  style="height:100%;width: 12%;background-color: white ;border: black;border-width: 5px;">
+                  <div class="charttitlediv">
+                    <p class="charttitle">Gauge chart</p>
+                  </div>
+                  <div id="actorsgaugechart" style="height:95%;overflow-y: scroll;"></div>
+
+
+
+
+
+                </div>
+              </div>
+            </div>
+            <div id="directorsbody" style=" display: none;  height: 100%;width: 100%;">
+
+
+              <div class="row" style="height: 50%;background-color: rgba(0, 0, 0, 0.733);">
+
+                <div style="width: 60%;">
+                  <div class="charttitlediv">
+                    <p class="charttitle">Genre Wise Movie Budget Details</p>
+                  </div>
+                  <div id="genrewisemoviebudget" style="height: 90%;"></div>
+                </div>
+
+
+                <div style="width: 40%;height:100%">
+
+                  <div style="margin-left: -7px;" class="charttitlediv row">
+                    <p class="charttitle col-md-3 ">Genre Percentage</p>
+                    <div class="col-md-7">
+                      <strong style="color: white;">Select </strong> <select style="width: 50px;" id="selectmeasure">
+                        <option>Max</option>
+                        <option>Min</option>
+                        <option>Std</option>
+                        <option>Mean</option>
+                        <option>Count</option>
+
+                      </select>
+
+                      <strong style="color: white;margin-left: 20px;">Select :</strong> <select style="width: 66px;"
+                        id="selectbudgetorprofit">
+                        <option>budget</option>
+                        <option>profit</option>
+                      </select>
+                    </div>
+                  </div>
+
+
+
+
+
+                  <div class="row" style="height: 90%;">
+
+                    <div id="donutdiv" style="width:58%;">
+                      <div id="genrewisepercentage"></div>
+                      <div id="donutcount" class="donuttext">0</div>
+                      <div class="donuttext" id="donutgenrelabel" style="font-size: 15px;margin-top:120px">Genre</div>
+                    </div>
+                    <div style="width:40%;" id="genrewisepercentagetable">Year wise movies</div>
+
+
+                  </div>
+
+                </div>
+
+              </div>
+
+
+              <div class="row" style="height: 50%;background-color: rgba(0, 0, 0, 0.733);">
+
+                <div style="width: 50%">
+
+
+
+                  <div class="charttitlediv">
+
+                    <p class="charttitle col-md-4">Best time to Release</p>
+                    <div class="col-md-5">
+                      <strong style="padding-left: 20px;color: white;">Select Time period :</strong> <select
+                        style="width: 90px;" id="selecttimeperiod">
+                        <option>Year</option>
+                        <option>Quarter</option>
+                        <option>Month</option>
+                        <option>Day</option>
+                        <option>Holiday</option>
+
+                      </select>
+
+
+                    </div>
+                  </div>
+
+                  <div id="moviereleaseddetails" style="height: 90%;"></div>
+
+                </div>
+                <div style="width: 50%">
+
+                  <div class="charttitlediv">
+                    <p class="charttitle">Histogram of Actors Movie Budget</p>
+                  </div>
+
+                  <div id="actorbudgethistogram" style="height: 90%;"></div>
+
+                </div>
+
+
+              </div>
+
+
+            </div>
+
+
+
+
+
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+
+
+    </script>
+
+
+
+    <!-- Optional JavaScript; choose one of the two! -->
+
+    <!-- Option 1: Bootstrap Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-b5kHyXgcpbZJO/tY9Ul7kGkf1S0CWuKcCD38l8YkeH8z8QjE0GmW1gYU5S9FOnJ0" crossorigin="anonymous">
+      </script>
+
+    <script type="text/javascript" src="{{ url_for('static',filename='design.js')  }}"></script>
+
+    <script>
+
+      var selectedGenre = []
+      var selectedActor = []
+      var selectedMeasure = "Mean";
+      var selectedType = "budget";
+      var selectedPeriod = "Year"
+      var selectedTypeChart = "bar"
+
+      // load google charts 
+      google.charts.load('current', { 'packages': ['corechart', 'gauge', 'table', "treemap"] });
+      google.charts.setOnLoadCallback(drawCharts);
+
+
+
+      function activateBodyof(s) {
+        var actors = $("#actorsbody")[0];
+        var movies = $("#moviesbody")[0];
+        var directors = $("#directorsbody")[0];
+        if (s == "movies") {
+          movies.style.display = "block";
+          actors.style.display = "none";
+          directors.style.display = "none";
+          drawAllMoviesChart()
+        } else if (s == "actors") {
+          actors.style.display = "block";
+          movies.style.display = "none";
+          directors.style.display = "none";
+          drawAllActorsChart()
+        } else {
+          directors.style.display = "block";
+          movies.style.display = "none";
+          actors.style.display = "none";
+          drawAllBudgetChart()
+        }
+      }
+
+
+
+      $(".chartgroup").on("click", function (e) {
+        selectedTypeChart = e.target.value;
+        showYearWiseReleasedTotleMovies()
+      })
+
+      function setDefaultActor(index) {
+
+        $("#actorselector")[0][index].selected = "selected";
+        selectedActor.push($("#actorselector")[0][0].innerText)
+      }
+      setDefaultActor(0)
+
+      $("#genreselector").on("change", function () {
+        selectedGenre = $("#genreselector").selectpicker().val();
+        showTopRatedMovieChart()
+        drawTopRatedActors()
+      })
+
+
+      $("#actorselector").on("change", function () {
+        selectedActor = $("#actorselector").selectpicker().val();
+        setTotalActorCard(selectedActor[selectedActor.length - 1])
+        showTopRatedMovieChart()
+        drawGaugeChart()
+        showYearWiseActorsPerformance()
+        drawActorsTreemap()
+        drawActorsBudgetHistogram()
+      })
+
+      $("#selectmeasure").on("change", function () {
+
+        selectedMeasure = $("#selectmeasure").val()
+        showGenreWiseBudgetPercentage()
+      })
+
+
+      $("#selectbudgetorprofit").on("change", function () {
+
+        selectedType = $("#selectbudgetorprofit").val()
+        showGenreWiseBudgetPercentage()
+      })
+
+      $("#selecttimeperiod").on("change", function () {
+
+        selectedPeriod = $("#selecttimeperiod").val()
+
+        drawBestTimeToReleased()
+
+      })
+      $("#sortoption").on("change", function () {
+        drawOverallTopRatedActors()
+      })
+
+
+      // get all data from python file
+      var context = {{ context| tojson }};
+      var yearWiseMoviesCounts = context.yearWise;
+      var topMovies = context.topMovies;
+      var actorsHitsFlops = context.actorsHitsFlops;
+      var yearWiseActorsPerformance = context.yearWiseActorsPerformance;
+      var topRatedActors = context.topRatedActors;
+      var genreWiseMovieBudget = context.genreWiseMovieBudget
+      var genreWiseBudgetDistribution = context.genreWiseBudgetDistribution;
+      var genreWiseProfitDistribution = context.genreWiseProfitDistribution;
+      var yearWiseActorsPerformanceList = context.yearWiseActorsPerformanceList;
+      var movieReleasedData = context.movieReleasedData;
+      var overallActorsData = context.overallActorsData;
+      var ageAndGenreData = context.ageAndGenreData;
+      var yearWiseMoviesCount = context.yearWiseMoviesCount;
+      var ActorsBudgetData = context.ActorsBudgetData;
+
+      // draw top rated movies
+
+      function showTopRatedMovieChart() {
+
+        var data = [];
+        let counter = 0;
+        if (selectedActor.length > 0 || selectedGenre.length > 0) {
+
+          for (let i = 1; i < topMovies.length; i++) {
+
+            if (counter < 15) {
+              var a1 = topMovies[i][3].toString().split("|").map(e => e.trim());
+              var a2 = selectedActor.filter(v => a1.includes(v));
+
+              var g1 = topMovies[i][2].toString().split("|").map(e => e.trim());
+              var g2 = selectedGenre.filter(v => g1.includes(v));
+
+              if (a2.length > 0 || g2.length > 0) {
+                data.push([topMovies[i][0], topMovies[i][1]])
+                counter++
+              }
+            }
+          }
+        } else {
+          data = topMovies.map(e => [e[0], e[1]]).slice(0, 15)
+
+        }
+        // append column names at front 
+        data.unshift(["Movie", "Rating"])
+
+
+        var data = google.visualization.arrayToDataTable(data);
+        var options = {
+
+          hAxis: { title: 'Movies' },
+          vAxis: { minValue: 0 },
+          legend: "none",
+          chartArea: { left: "50", height: "80%", width: "98%", top: "30", right: "40", bottom: "60" },
+          colors: ["darkblue"],
+          animation: {
+            duration: 1000,
+            easing: 'out',
+            startup: true,
+
+
+          }
+        };
+        var chart = new google.visualization.ColumnChart(document.getElementById('topratedmovies'));
+        chart.draw(data, options);
+      }
+
+      // draw year wise movies
+      function showYearWiseReleasedTotleMovies() {
+
+
+        var chartSize = { left: "50", height: "80%", width: "98%", top: "30", right: "40", bottom: "40" };
+
+
+        if (selectedTypeChart == "waterfall") {
+          var data = google.visualization.arrayToDataTable(yearWiseMoviesCounts, true);
+          var options = {
+
+            titleTextStyle: {
+              fontSize: 20
+            },
+            chartArea: chartSize,
+            pointShape: "circle",
+            pointSize: 12,
+            hAxis: { title: 'Year' },
+            vAxis: { minValue: 30 },
+            crosshair: { trigger: "selection" },
+            curveType: "function",
+            bar: { groupWidth: '100%' },
+            legend: "none",
+            animation: {
+              duration: 800,
+              easing: 'inAndOut',
+              startup: true
+            },
+          };
+          var chart = new google.visualization.CandlestickChart(document.getElementById('yearwisemovies'));
+          chart.draw(data, options);
+        } else if (selectedTypeChart == "bar") {
+          var t = yearWiseMoviesCount.map(e => [e[0].toString(), e[1]])
+          t.unshift(["Year", "Counts"])
+          var data = google.visualization.arrayToDataTable(t);
+          var options = {
+
+            titleTextStyle: {
+              fontSize: 20
+            },
+            pointShape: "circle",
+            pointSize: 12,
+            chartArea: chartSize,
+            hAxis: { title: 'Year' },
+            vAxis: { minValue: 30 },
+            crosshair: { trigger: "selection" },
+            curveType: "function",
+
+            bar: { groupWidth: '90%' },
+            legend: "none",
+            animation: {
+              duration: 800,
+              easing: 'inAndOut',
+              startup: true
+            },
+          };
+          var chart = new google.visualization.ColumnChart(document.getElementById('yearwisemovies'));
+          chart.draw(data, options);
+
+          google.visualization.events.addListener(chart, 'select',
+            function () {
+              var t = chart.getSelection()[0];
+              setTotalMoviesCard(data.getValue(t.row, 1))
+            });
+        }
+      }
+
+      // draw heatmap
+      function setContentOfTable() {
+        data = ageAndGenreData;
+        var html = "";
+        for (var x in data) {
+          html += "<tr>"
+          if (x == 0) {
+            for (var y in data[0]) { html += "<td class='tcol'>" + data[0][y] + "</td>" }
+          } else {
+
+            for (var y in data[x]) {
+              if (y != 0) {
+                html += `<td style="background-color:rgba(0, 153, 153,${parseInt(data[x][y].split(" %")[0]) / 100})">${data[x][y]}</td>`;
+              } else {
+                html += "<td class='tindex'>" + data[x][y] + "</td>"
+              }
+
+            }
+          }
+
+          html += "</tr>"
+        }
+
+        $("#agegrouptable").html(html)
+
+      }
+
+
+
+
+
+      function drawOverallTopRatedActors() {
+
+
+        if ($("#sortoption").val() == "Total Movies") {
+          overallActorsData = overallActorsData.sort(function (a, b) {
+            return b[1] - a[1];
+          })
+        } else {
+
+          overallActorsData = overallActorsData.sort(function (a, b) {
+            return b[2] - a[2];
+          })
+        }
+
+        var t = overallActorsData.slice(0, 15);
+        t.unshift(["Actor", "Total Movies", "Total Hits"]);
+
+
+
+        var data = google.visualization.arrayToDataTable(t)
+
+        var options = {
+          hAxis: { title: 'Actors' },
+          bar: { groupHeight: "100%" },
+          vAxis: {
+            viewWindowMode: "explicit",
+            viewWindow: {
+              max: 10
+            }
+          },
+          hAxis: {
+            title: "Total Movies count"
+          },
+          colors: ["black", "gray"],
+
+          animation: {
+            duration: 800,
+            easing: 'inAndOut',
+            startup: true
+          },
+          chartArea: { top: 10, bottom: 20 }
+        };
+        var chart = new google.visualization.BarChart(document.getElementById('overalltopratedactors'));
+        chart.draw(data, options);
+
+        google.visualization.events.addListener(chart, 'select',
+          function () {
+            var t = chart.getSelection()[0];
+            setTotalMoviesCard(data.getValue(t.row, 1))
+          });
+      }
+
+
+
+      function showYearWiseActorsPerformance() {
+
+        if (selectedActor.length > 0) {
+
+          var actorsIndexs = []
+          for (let i = 0; i < selectedActor.length; i++) {
+            j = yearWiseActorsPerformance[0].indexOf(selectedActor[i])
+            if (j != -1) {
+              actorsIndexs.push(j)
+            }
+          }
+
+          data = []
+          for (let i = 0; i < yearWiseActorsPerformance.length; i++) {
+            row = [yearWiseActorsPerformance[i][0]]
+            actorsIndexs.forEach(function (e) { row.push(yearWiseActorsPerformance[i][e]) })
+            data.push(row)
+          }
+          var data = google.visualization.arrayToDataTable(data)
+          var options = {
+
+            chartArea: { "left": 30, top: "30", width: "78%", height: "75%" },
+            hAxis: { title: 'Year' },
+            vAxis: { minValue: 0 },
+            curveType: 'function',
+            pointShape: "traingle",
+            colors: ["black", "gray", "green", "blue", "red", "yellow"],
+            pointSize: 10,
+
+
+          };
+          var chart = new google.visualization.LineChart(document.getElementById('yearwiseactorperformance'));
+          chart.draw(data, options)
+
+
+        }
+      }
+
+
+
+
+      function drawTopRatedActors() {
+
+        data1 = []
+        counter = 15;
+        if ((selectedGenre.length > 0)) {
+          for (let i = 0; i < topRatedActors.length; i++) {
+            if (counter > 0) {
+
+
+              if (topRatedActors[i][0].indexOf(selectedGenre) != -1) {
+                data1.push([topRatedActors[i][0], topRatedActors[i][1], topRatedActors[i][2]])
+                counter--;
+              }
+
+
+            }
+          }
+
+        } else {
+          data1 = topRatedActors.slice(0, 15)
+        }
+        data1.unshift(["Genre", "Actor", "Rating"])
+        var data = data1.map(e => [e[1], e[2]])
+
+        var data1 = google.visualization.arrayToDataTable(data1)
+        var data = google.visualization.arrayToDataTable(data)
+
+        var options = {
+
+          hAxis: { title: 'Rating' },
+          chartArea: { top: "20", right: "30", left: "80", bottom: "30" },
+          legend: "none",
+          colors: ["gray"],
+          animation: {
+            duration: 800,
+            easing: 'inAndOut',
+            startup: true
+          },
+
+        };
+        var chart = new google.visualization.BarChart(document.getElementById('genrewiseratedactors'));
+        chart.draw(data, options);
+      }
+
+      function drawActorsTreemap() {
+        var data = [];
+        if (selectedActor.length > 0) {
+          for (let i = 1; i < yearWiseActorsPerformanceList.length; i++) {
+
+            var a1 = yearWiseActorsPerformanceList[i][0].toString().split("|").map(e => e.trim());
+            var a2 = selectedActor.filter(v => a1.includes(v));
+            if (a2.length > 0) {
+              data.push([yearWiseActorsPerformanceList[i][0], "All", yearWiseActorsPerformanceList[i][1]])
+            }
+          }
+        } else {
+          data = yearWiseActorsPerformanceList.slice(0, 10).map(e => [e[0], "All", e[1]])
+        }
+        data.unshift(["All", null, 0])
+        data.unshift(["Actor", "Parent", "HitRatio"])
+
+        var data = google.visualization.arrayToDataTable(data);
+
+        tree = new google.visualization.TreeMap(document.getElementById('actorstreemap'));
+        var options = {
+          minColor: '#f00',
+          midColor: '#ddd',
+          maxColor: '#0d0',
+          headerHeight: 20,
+          fontColor: 'black',
+          showScale: true,
+          generateTooltip: showStaticTooltip
+        }
+        tree.draw(data, options);
+
+        function showStaticTooltip(row, size, value) {
+          return `<div style="background:#fd9; padding:10px; border-style:solid">
+                <p>Actor :  ${data.getValue(row, 0)}</p>
+                <p>Hit Rate :  ${Math.round(data.getValue(row, 2) * 100)}%</p>
+                </div>`;
+        }
+      }
+
+      // draw gauge chart
+      function drawGaugeChart() {
+
+
+        l2 = actorsHitsFlops.filter(e => selectedActor.includes(e[0]))
+        if (l2.length > 0) {
+
+          l2 = l2.map(e => [e[0], Math.round(e[1] * 100 / (e[1] + e[2]))])
+          l2.unshift(["Actor", "Rate"])
+
+          var options = {
+            redFrom: 20, redTo: 40,
+            yellowFrom: 40, yellowTo: 75,
+            greenFrom: 75, greenTo: 100,
+            minorTicks: 4,
+            majorTicks: 6,
+            chartArea: { width: "95%" },
+
+          }
+
+          var data = google.visualization.arrayToDataTable(l2);
+          var chart = new google.visualization.Gauge(document.getElementById('actorsgaugechart'));
+          chart.draw(data, options);
+        }
+        else {
+
+        }
+
+      }
+
+
+
+
+
+
+
+
+      // draw candle stick chart
+      function drawGenreWiseBudget() {
+        var data = google.visualization.arrayToDataTable(genreWiseMovieBudget.slice(0, genreWiseMovieBudget.length - 2), true)
+
+        var options = {
+
+          vAxis: { title: "Budget" },
+          colors: ["darkgray"],
+          hAxis: {
+            title: 'Genre',
+            explorer: { axis: 'horizontal', keepInBounds: true },
+            bar: { groupWidth: "100%" },
+            selectionMode: 'multiple'
+          },
+          legend: "none",
+          chartArea: { left: 45, top: 30, width: "90%", height: "70%" }
+
+        };
+        var chart = new google.visualization.CandlestickChart(document.getElementById('genrewisemoviebudget'));
+        chart.draw(data, options);
+      }
+
+      // draw donut chart and table
+      function showGenreWiseBudgetPercentage() {
+
+        var selectedData;
+        if (selectedType == "budget") {
+          selectedData = genreWiseBudgetDistribution
+          title = "Genre Wise Budget Distribution "
+        } else if (selectedType == "profit") {
+          selectedData = genreWiseProfitDistribution
+          title = "Genre Wise Profit Distribution "
+        }
+
+        var i = selectedData[0].indexOf(selectedMeasure.toLocaleLowerCase())
+        d = selectedData.map(e => [e[0], e[i]])
+        sorted_d = d.slice(1, d.length).sort(function (a, b) { return b[1] - a[1]; })
+        sorted_d.unshift(d[0])
+
+
+
+        var data = google.visualization.arrayToDataTable(sorted_d)
+
+
+        var pieoptions = {
+          title: title,
+          hAxis: { title: 'Actors' },
+          legend: "none",
+          height: 292,
+          pieHole: 0.5,
+          showLables: "true",
+          chartArea: { left: 30, top: 30, width: "100%", height: "85%" }
+        };
+
+        var tableoptions = { height: 292, width: 200 };
+
+
+        var piechart = new google.visualization.PieChart(document.getElementById('genrewisepercentage'));
+        var tablechart = new google.visualization.Table(document.getElementById('genrewisepercentagetable'));
+        piechart.draw(data, pieoptions);
+        tablechart.draw(data, tableoptions);
+
+        google.visualization.events.addListener(piechart, "select", function () {
+          var row = piechart.getSelection()[0].row;
+          $("#donutcount")[0].innerText = Math.round(data.getValue(row, 1))
+          $("#donutgenrelabel")[0].innerText = data.getValue(row, 0).toString();
+
+          tablechart.setSelection(piechart.getSelection());
+        });
+
+        google.visualization.events.addListener(tablechart, 'select',
+          function () {
+            piechart.setSelection(tablechart.getSelection());
+          });
+
+      }
+
+      function drawBestTimeToReleased() {
+
+
+        dataIndex = 1
+        name = ""
+
+        if (selectedPeriod == "Year") { dataIndex = 1; name = "Year" }
+        else if (selectedPeriod == "Quarter") { dataIndex = 5; name = "Quarter" }
+        else if (selectedPeriod == "Month") { dataIndex = 3; name = "Month" }
+        else if (selectedPeriod == "Day") { dataIndex = 4; name = "Day" }
+        else if (selectedPeriod == "Holiday") { dataIndex = 6; name = "Holiday" }
+
+
+
+        var d = categoryCounter(movieReleasedData.map(e => e[dataIndex]).slice(1))
+        d.unshift([name, "count"])
+
+        var data = google.visualization.arrayToDataTable(d);
+        var options = {
+
+          hAxis: { title: name },
+          vAxis: { minValue: 0, title: "Movie Count" },
+          legend: "none",
+          colors: ["black"],
+          chartArea: { top: 20, left: 60, width: "85%", height: "70%" },
+
+          animation: {
+            duration: 800,
+            easing: 'inAndOut',
+            startup: true
+          }
+        };
+        var chart = new google.visualization.ColumnChart(document.getElementById('moviereleaseddetails'));
+        chart.draw(data, options);
+
+        google.visualization.events.addListener(chart, 'select',
+          function () {
+            var t = chart.getSelection()[0];
+            setTotalMoviesCard(data.getValue(t.row, 1))
+          });
+
+
+      }
+
+      // draw histogram
+
+
+      function drawActorsBudgetHistogram() {
+
+        let forActor = ""
+        var data = []
+        if (selectedActor.length >= 1) {
+          forActor = selectedActor[selectedActor.length - 1]
+        } else {
+          forActor = "Govinda"
+        }
+        for (let i = 0; i < ActorsBudgetData.length; i++) {
+          if (ActorsBudgetData[i][4] == forActor) { data.push([ActorsBudgetData[i][1], ActorsBudgetData[i][2]]) }
+        }
+
+        data.unshift(["Movie", "Budget"])
+        var data = google.visualization.arrayToDataTable(data);
+
+        var options = {
+
+          legend: { position: 'none' },
+          vAxis: { title: "Movie counts" },
+          hAxis: { title: "Movie Budget" },
+          chartArea: { left: 55, top: 20, width: "84%", height: "80%" },
+          colors: ["gray"],
+
+
+        };
+
+        var chart = new google.visualization.Histogram(document.getElementById('actorbudgethistogram'));
+        chart.draw(data, options);
+
+
+      }
+
+
+
+
+      function categoryCounter(data) {
+        d1 = {}
+        for (let i = 0; i < data.length; i++) {
+          if (d1[data[i]] == undefined) { d1[data[i]] = 1 }
+          else { d1[data[i]] = d1[data[i]] + 1 }
+        }
+        d2 = []
+        for (const [k, v] of Object.entries(d1)) {
+          d2.push([k, v])
+        }
+        return d2
+
+      }
+
+
+
+
+      function setTotalMoviesCard(v) {
+        $("#totalmoviescount")[0].innerText = v
+      }
+
+      function setTotalActorCard(v) {
+        $("#lastselectedactor")[0].innerText = v
+      }
+
+
+      function drawAllMoviesChart() {
+        showTopRatedMovieChart()
+        showYearWiseReleasedTotleMovies()
+        setContentOfTable()
+      }
+      function drawAllActorsChart() {
+
+        drawOverallTopRatedActors()
+        showYearWiseActorsPerformance()
+        drawTopRatedActors()
+        drawActorsTreemap()
+        drawGaugeChart()
+
+      }
+
+      function drawAllBudgetChart() {
+        drawGenreWiseBudget()
+        showGenreWiseBudgetPercentage()
+        drawBestTimeToReleased()
+        drawActorsBudgetHistogram()
+      }
+
+
+
+
+      function drawCharts() {
+        // only home page charts has been drawn
+        showYearWiseReleasedTotleMovies()
+        showTopRatedMovieChart()
+        drawTopRatedActors()
+        setContentOfTable()
+
+      }
+
+
+
+
+
+
+
+
+
+
+
+    </script>
+
+
+
+
+    <script>
+      // d3.charts
+
+
+      var circlePackingData = context.getGenreDataForCirclePackingChart;
+      var vWidth = 270;
+      var vHeight = 270;
+      var textThresholdVal = circlePackingData[7].size
+
+
+      function shuffleData(data) {
+        let i = 0;
+
+        while (i <= 20) {
+          a = Math.floor(Math.random(0, data.length) * data.length)
+          b = Math.floor(Math.random(0, data.length) * data.length)
+          data[b] = [data[a], data[a] = data[b]][0];
+          i++;
+        }
+        return data
+
+      }
+
+
+      var svg = d3.select("#circlepackingchart").append('svg').attr('width', vWidth).attr('height', vHeight).style("margin-left", "190px").style("margin-top", "10px");
+
+      // Get the data from our CSV file
+
+
+      vData = d3.stratify()(shuffleData(circlePackingData));
+
+      drawCircleChart(vData);
+
+      function drawCircleChart(vData) {
+
+
+        var vRoot = d3.hierarchy(vData).sum(function (d) { return d.data.size; });
+        var vNodes = vRoot.descendants();
+        var Circles = svg.selectAll('g').style("margin-left", "100px").data(vNodes).enter().append('g');
+        var vSlices = Circles.append('circle').style("class", "circles");
+
+        // Declare d3 layout
+        var vLayout = d3.pack().size([vWidth, vHeight]);
+
+        var color = () => {
+          return 'rgba(' + ~~(Math.random() * 255) + ',' + ~~(Math.random() * 255) + ',' + ~~(Math.random() * 255) + ', .9)'
+        }
+
+        var Tooltip = d3.select("#circlepackingchart")
+          .append("div")
+          .style("opacity", 0)
+          .attr("class", "tooltip")
+          .style("background-color", "white")
+          .style("color", "black")
+          .style("width", "80px")
+          .style("font-size", "13px")
+          .style("text-align", "center")
+          .style("border", "2px solid gray")
+          .style("padding", "3px")
+          .style("border-width", "2px")
+          .style("position", "absolute")
+          .style("z-index", "10")
+
+
+        var mouseover = function (d) {
+          Tooltip.style("opacity", 1)
+          d3.select(this).style("stroke-width", "3").style("stroke", "black");
+
+        }
+
+
+        var mousemove = function (d) {
+          Tooltip
+            .html("<b>" + d.data.id + "</b>" + "<hr style='color:white;margin-top:0;margin-bottom:0'>" + d.value + "(" + Math.round((d.value / vRoot.value) * 100) + "%)")
+            .style("left", (d3.mouse(this)[0] + 810) + "px")
+            .style("top", (d3.mouse(this)[1] + vHeight + 10) + "px")
+        }
+
+        var mouseleave = function (d) {
+          Tooltip
+            .style("opacity", 0)
+
+
+          d3.select(this).style("stroke-width", "0").style("stroke", "white");
+        }
+
+        // Layout + Data
+        vLayout(vRoot);
+
+
+        // Draw on screen
+        vSlices.attr('cx', function (d) { return d.x; })
+          .attr('cy', function (d) { return d.y; })
+          .attr('r', function (d) { return d.r; })
+          .attr("dx", function (d) { return -20 })
+          .style("fill", d => color())
+          .attr("class", "circlepack")
+          .on("mouseover", mouseover)
+          .on("mousemove", mousemove)
+          .on("mouseleave", mouseleave);
+
+
+
+
+
+        Circles.append("text")
+          .attr("x", function (d) { return d.x - d.x / 7 })
+          .attr("y", function (d) { return d.y })
+          .attr("dy", "0.90em")
+          .attr("font-size", function (d) { return "10px" })
+          .text(function (d) {
+            if (d.value > textThresholdVal) {
+              return d.data.id + "(" + Math.round((d.value / vRoot.value) * 100) + "%)"
+            }
+          })
+      }
+    </script>
+</body>
+
+</html>

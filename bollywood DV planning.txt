@@ -1,0 +1,19 @@
+
+1,Column chart , Showing top rated movies ( all or particular genre) , actors and directors 
+2, Gauge chart & combo chart : Showing comparision between more than 1 actor based on number of hits and  flops  movies
+3, Filters , provide year wise filtering to visualize data periodically, 
+4, waterfall chart , year wise total number of released movies,
+5, line chart , year wise performance of actor
+6, donut chart , which type of movies peoples like to watch ( based on ratings ) 
+7, tables & treemap , shows top rated actors in  particular genre
+8, candlestick chart , Shows average budget require for each genre movie, How much average profit a movie can earned in particular genre, 
+9, ,shows which time period is best to release movie.
+10, Cards , to shows numeric values (ex : genre wise total number of movies)
+
+Bollywood dataset taken from the kaggle.com website
+Data source link : https://www.kaggle.com/mitesh58/bollywood-movie-dataset
+
+
+		min , 25% , 75% , max
+horror                    
+
